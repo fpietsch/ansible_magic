@@ -1,0 +1,38 @@
+- name: Download Prometheus from url to local Control Machine
+  delegate_to: 127.0.0.1
+  get_url:
+    url: "{{ prometheus_url }}"
+    dest: "{{playbook_dir}}/files/prometheus.tar.gz"
+    validate_certs: no
+    use_proxy: yes
+    force: no
+
+##Prepare Offline Installation on Remote Nodes (Fabian)
+- name: Copy Prometheus Installation-Files to Remote-Node
+  copy:
+    src:  "{{playbook_dir}}/files/prometheus.tar.gz"
+    dest: "/tmp/prometheus.tar.gz"
+
+## Unzip Install Files
+- name: Unzip Prometheus Install Files
+  command: tar -C /monitoring -xzf /tmp/prometheus.tar.gz
+
+- name: Get Name of Prometheus Folder from Archive
+  shell: tar tf /tmp/prometheus.tar.gz | head -1 | sed -e 's/\/.*//'
+  changed_when: false
+  register: tar_name
+
+#Create a soft link in /usr/bin
+- name: Create a soft link
+  command: ln -sf /monitoring/{{tar_name.stdout}}/prometheus /usr/bin
+
+#create an Upstart configuration file .conf
+- name: Copy Configuration File
+  vars:
+    nodes_to_monitor: "{{ groups['ES_Nodes'] }}"
+  template: src=prometheus.conf.j2 dest=/etc/init/prometheus.conf force=yes
+
+- name: Copy Configuration File
+  vars:
+    nodes_to_monitor: "{{ groups['ES_Nodes'] }}"
+  template: src=prometheus.yml.j2 dest=/monitoring/{{tar_name.stdout}}/prometheus.yml force=yes

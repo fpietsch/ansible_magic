@@ -1,0 +1,30 @@
+- name: Create Directories
+  file: path=/etc/init state=directory
+
+
+##Install Files on Remote Nodes
+- include: InstallPrometheus.yml
+  tags:
+      - install
+      - start
+
+##Start Go Exporter on Remote Nodes
+- include: start.yml
+  tags:
+      - start
+
+##Remove Install Files on Remote Nodes
+- include: clean.yml
+  tags:
+      - clean
+
+- meta: flush_handlers
+
+#- name: daemon-reload
+#  shell: systemctl daemon-reload
+
+- name: Wait 5 seconds to come up
+  pause: seconds=5
+
+- name: Wait for Prometheus to startup
+  wait_for: host={{ansible_default_ipv4.address}} port=9090 delay=1 connect_timeout=1

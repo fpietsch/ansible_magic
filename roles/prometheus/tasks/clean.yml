@@ -1,0 +1,2 @@
+- name: Delete Prometheus Install File
+  file: dest=/tmp/prometheus.tar.gz state=absent

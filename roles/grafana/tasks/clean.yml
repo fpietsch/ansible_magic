@@ -1,0 +1,2 @@
+- name: Delete Grafana Install File
+  file: dest=/tmp/grafana.rpm state=absent

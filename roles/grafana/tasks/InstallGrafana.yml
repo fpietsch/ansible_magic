@@ -1,0 +1,20 @@
+- name: Download Grafana from url to local Control Machine
+  delegate_to: 127.0.0.1
+  get_url:
+    url: "{{ grafana_url }}"
+    dest: "{{playbook_dir}}/files/grafana.rpm"
+    validate_certs: no
+    use_proxy: yes
+    force: no
+
+##Prepare Offline Installation on Remote Nodes (Fabian)
+- name: Copy Grafana Installation-Files to Remote-Node
+  copy:
+    src:  "{{playbook_dir}}/files/grafana.rpm"
+    dest: "/tmp/grafana.rpm"
+
+- name: Install Grafana from local RPM File
+  yum:
+    name: "/tmp/grafana.rpm"
+    state: present
+##

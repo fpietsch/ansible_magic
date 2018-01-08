@@ -1,0 +1,19 @@
+#Copy the config template
+#- name: Get Name of Prometheus Folder from Archive
+#  shell: tar tf /tmp/prometheus.tar.gz | head -1 | sed -e 's/\/.*//'
+#  changed_when: false
+#  register: tar_name
+
+#- name: Copy Configuration File
+#  vars:
+#    nodes_to_monitor: "{{ groups['ES_Nodes'] }}"
+#  template: src=prometheus.yml.j2 dest=/monitoring/{{tar_name.stdout}}/prometheus.yml force=yes
+
+#- name: Start prometheus as Job in Background
+#  shell: "( ( nohup /monitoring/{{tar_name.stdout}}/prometheus -config.file=/monitoring/{{tar_name.stdout}}/prometheus.yml 1>/dev/null 2>&1 ) & )"
+#  async: 10
+#  poll: 0
+
+- service:
+    name: prometheus
+    state: started

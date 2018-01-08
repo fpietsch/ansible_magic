@@ -1,0 +1,35 @@
+---
+#Autor of Ansible Projekt inkl. Roles: Fabian Pietsch (07.07.2017) v0.1
+
+- hosts: Prometheus
+  serial: 1
+  roles:
+    - {
+      environment: "{{proxy_env}}",
+      role: prometheus }
+  vars:
+    proxy_env:
+      http_proxy: "{{proxyServer}}"
+      https_proxy: "{{proxyServer}}"
+
+- hosts: Grafana
+  serial: 1
+  roles:
+    - {
+      role: grafana }
+  vars:
+    proxy_env:
+      http_proxy: "{{proxyServer}}"
+      https_proxy: "{{proxyServer}}"
+
+- hosts: SSHKEYS
+  serial: 1
+  roles:
+    - {
+      role: sshkeys }
+  vars:
+    key_files:
+      - id_rsa.pub
+    proxy_env:
+      http_proxy: "{{proxyServer}}"
+      https_proxy: "{{proxyServer}}"

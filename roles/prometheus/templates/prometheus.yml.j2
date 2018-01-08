@@ -1,0 +1,18 @@
+# external systems (federation, remote storage, Alertmanager).
+#external_labels:
+#monitor: 'codelab-monitor'
+## Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+#rule_files:
+# - "first.rules"
+# - "second.rules"
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+# The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
+{% for host in nodes_to_monitor %}
+- job_name: '{{ hostvars[host].inventory_hostname }}'
+  scrape_interval: 15s
+  static_configs:
+    - targets: ['{{ hostvars[host].ansible_default_ipv4.address }}:9108']
+{% endfor %}
